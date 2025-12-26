@@ -1,20 +1,20 @@
 <template>
   <div id="app">
-    <div class="app-header">
-      <h1 class="logo">{{ logoPrefix }}<span class="accent">{{ logoSuffix }}</span></h1>
-    </div>
-    <SwipeCarousel />
+<!--    <div class="app-header">-->
+<!--      <h1 class="logo">{{ logoPrefix }}<span class="accent">{{ logoSuffix }}</span></h1>-->
+<!--    </div>-->
+    <loginPage />
   </div>
 </template>
 
 <script>
-import SwipeCarousel from './components/SwipeCarousel.vue'
+import LoginPage from './components/layout/auth/LoginPage.vue'
 import { t } from '@/lang'
 
 export default {
   name: 'App',
   components: {
-    SwipeCarousel
+    LoginPage
   },
   computed: {
     logoPrefix() {

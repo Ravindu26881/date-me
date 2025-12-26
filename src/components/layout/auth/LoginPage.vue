@@ -1,11 +1,13 @@
 <template>
+<div>
+login
+</div>
 </template>
 
 <script>
-import { t } from '@/lang';
 
 export default {
-  name: 'Login',
+  name: 'LoginPage',
   props: {
   },
   computed: {
