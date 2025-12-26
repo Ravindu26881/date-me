@@ -32,6 +32,7 @@
         </div>
       </template>
     </div>
+  
     <div v-if="!noMoreUsers" class="action-buttons">
       <button class="action-btn dislike" @click="swipeLeft">
         <span class="btn-icon">&#x2715;</span>
