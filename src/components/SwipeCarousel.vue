@@ -3,7 +3,6 @@
     <div class="cards-container">
       <div v-if="noMoreUsers" class="no-more-users">
         <div class="empty-state">
-          <span class="heart-icon">&#x1F494;</span>
           <h2>{{ texts.noMoreProfiles }}</h2>
           <p>{{ texts.checkBackLater }}</p>
           <button class="reset-btn" @click="resetUsers">{{ texts.startOver }}</button>
