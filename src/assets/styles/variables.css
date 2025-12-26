@@ -1,0 +1,63 @@
+:root {
+  /* Background Colors */
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-tertiary: #0f3460;
+  
+  /* Accent Colors */
+  --accent-pink: #f093fb;
+  --accent-coral: #f5576c;
+  --accent-purple: #667eea;
+  --accent-violet: #764ba2;
+  
+  /* Action Colors */
+  --color-like: #51cf66;
+  --color-like-dark: #40c057;
+  --color-dislike: #ff6b6b;
+  --color-super-like: #339af0;
+  --color-super-like-dark: #228be6;
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.9);
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --text-faded: rgba(255, 255, 255, 0.6);
+  
+  /* Card Gradient Presets */
+  --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --gradient-6: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  --gradient-7: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  --gradient-8: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  
+  /* UI Colors */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg-light: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-border-light: rgba(255, 255, 255, 0.3);
+  
+  /* Shadow Colors */
+  --shadow-dark: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.2);
+  --shadow-light: rgba(0, 0, 0, 0.15);
+  --shadow-accent: rgba(240, 147, 251, 0.4);
+  --shadow-accent-hover: rgba(240, 147, 251, 0.5);
+  
+  /* Overlay Colors */
+  --overlay-gradient: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+  --header-gradient: linear-gradient(to bottom, rgba(26, 26, 46, 0.9) 0%, transparent 100%);
+  
+  /* Ambient Light Effects */
+  --ambient-pink: rgba(240, 147, 251, 0.15);
+  --ambient-coral: rgba(245, 87, 108, 0.1);
+  
+  /* Button Colors */
+  --btn-light-bg: linear-gradient(135deg, #fff 0%, #f8f8f8 100%);
+  --btn-like-bg: linear-gradient(135deg, var(--color-like) 0%, var(--color-like-dark) 100%);
+  --btn-super-like-bg: linear-gradient(135deg, var(--color-super-like) 0%, var(--color-super-like-dark) 100%);
+  --btn-reset-bg: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-coral) 100%);
+}
+
