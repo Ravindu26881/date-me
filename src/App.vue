@@ -16,7 +16,8 @@
 
     <!-- Main app view -->
     <template v-else>
-      <div class="app-header">
+      <!-- Header (shown on main page only) -->
+      <div class="app-header" v-if="currentPage === 'home'">
         <h1 class="logo">{{ logoPrefix }}<span class="accent">{{ logoSuffix }}</span></h1>
         
         <!-- User Menu -->
@@ -41,6 +42,13 @@
                 </div>
               </div>
               <div class="dropdown-divider"></div>
+              <button class="dropdown-item" @click="goToSettings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                {{ t('settings.title') }}
+              </button>
               <button class="dropdown-item logout" @click="handleLogout">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -53,7 +61,23 @@
           </transition>
         </div>
       </div>
-      <SwipeCarousel />
+
+      <!-- Pages -->
+      <SwipeCarousel v-if="currentPage === 'home'" :current-user-id="currentUserId" />
+      
+      <SettingsPage 
+        v-else-if="currentPage === 'settings'"
+        @go-back="currentPage = 'home'"
+        @edit-profile="currentPage = 'editProfile'"
+        @logout="handleLogout"
+      />
+      
+      <EditProfile 
+        v-else-if="currentPage === 'editProfile'"
+        :user="currentUser"
+        @go-back="currentPage = 'settings'"
+        @profile-updated="handleProfileUpdated"
+      />
     </template>
   </div>
 </template>
@@ -62,6 +86,8 @@
 import SwipeCarousel from './components/SwipeCarousel.vue'
 import UserLogin from './components/layout/auth/login.vue'
 import UserRegister from './components/layout/auth/register.vue'
+import SettingsPage from './components/layout/SettingsPage.vue'
+import EditProfile from './components/layout/EditProfile.vue'
 import { t } from '@/lang'
 import { isLoggedIn, logout, getCurrentUser } from '@/services/authService'
 
@@ -70,7 +96,9 @@ export default {
   components: {
     SwipeCarousel,
     UserLogin,
-    UserRegister
+    UserRegister,
+    SettingsPage,
+    EditProfile
   },
   directives: {
     'click-outside': {
@@ -92,6 +120,7 @@ export default {
       isAuthenticated: false,
       currentUser: null,
       authView: 'login',
+      currentPage: 'home',
       showUserMenu: false
     }
   },
@@ -107,6 +136,9 @@ export default {
     },
     userInitial() {
       return this.displayName.charAt(0).toUpperCase();
+    },
+    currentUserId() {
+      return this.currentUser?._id || this.currentUser?.id || null;
     }
   },
   created() {
@@ -128,6 +160,7 @@ export default {
     handleAuthSuccess(user) {
       this.currentUser = user;
       this.isAuthenticated = true;
+      this.currentPage = 'home';
     },
     toggleUserMenu() {
       this.showUserMenu = !this.showUserMenu;
@@ -135,12 +168,20 @@ export default {
     closeUserMenu() {
       this.showUserMenu = false;
     },
+    goToSettings() {
+      this.showUserMenu = false;
+      this.currentPage = 'settings';
+    },
+    handleProfileUpdated(updatedUser) {
+      this.currentUser = { ...this.currentUser, ...updatedUser };
+    },
     handleLogout() {
       this.showUserMenu = false;
       logout();
       this.isAuthenticated = false;
       this.currentUser = null;
       this.authView = 'login';
+      this.currentPage = 'home';
     }
   }
 }
