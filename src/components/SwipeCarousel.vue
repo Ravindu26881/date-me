@@ -63,6 +63,12 @@ export default {
   components: {
     UserCard
   },
+  props: {
+    currentUserId: {
+      type: String,
+      default: null
+    }
+  },
   data() {
     return {
       users: [],
@@ -105,7 +111,12 @@ export default {
   },
   methods: {
     async loadUsers() {
-      this.users = await getUsers();
+      const allUsers = await getUsers();
+      // Filter out the current logged-in user
+      this.users = allUsers.filter(user => {
+        const userId = user._id || user.id;
+        return userId !== this.currentUserId;
+      });
     },
     startDrag(event) {
       this.isDragging = true;
