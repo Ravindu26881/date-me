@@ -63,5 +63,33 @@ export default {
     
     // Logout
     logout: 'Log out'
+  },
+  settings: {
+    title: 'Settings',
+    account: 'Account',
+    editProfile: 'Edit Profile',
+    editProfileDesc: 'Update your personal information',
+    changePassword: 'Change Password',
+    changePasswordDesc: 'Update your password',
+    preferences: 'Preferences',
+    notifications: 'Notifications',
+    notificationsDesc: 'Receive match notifications',
+    dangerZone: 'Danger Zone',
+    logout: 'Log Out',
+    logoutDesc: 'Sign out of your account'
+  },
+  profile: {
+    editTitle: 'Edit Profile',
+    save: 'Save',
+    photoHint: 'Tap to change photo',
+    basicInfo: 'Basic Information',
+    usernamePlaceholder: 'Your display name',
+    emailPlaceholder: 'your@email.com',
+    aboutMe: 'About Me',
+    bio: 'Bio',
+    bioPlaceholder: 'Tell others about yourself...',
+    identity: 'Identity & Preferences',
+    saveSuccess: 'Profile updated successfully!',
+    saveError: 'Failed to update profile. Please try again.'
   }
 };
