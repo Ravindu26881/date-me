@@ -1,17 +1,29 @@
 <template>
   <div 
     class="user-card" 
-    :class="{ 'swiping-left': swipeDirection === 'left', 'swiping-right': swipeDirection === 'right' }"
+    :class="{ 
+      'swiping-left': swipeDirection === 'left', 
+      'swiping-right': swipeDirection === 'right',
+      'has-image': user.profilePicUrl 
+    }"
     :style="cardStyle"
   >
+    <!-- Profile image background -->
+    <img 
+      v-if="user.profilePicUrl" 
+      :src="user.profilePicUrl" 
+      :alt="user.username"
+      class="card-bg-image"
+    />
+    
     <div class="card-gradient"></div>
     
     <div class="card-content">
-      <div class="user-avatar">
+      <div v-if="!user.profilePicUrl" class="user-avatar">
         {{ user.username.charAt(0).toUpperCase() }}
       </div>
       
-      <div class="user-info">
+      <div class="user-info" :class="{ 'with-image': user.profilePicUrl }">
         <h2 class="username">{{ user.username }}</h2>
         <p class="age">{{ user.age }} {{ texts.yearsOld }}</p>
         
@@ -93,6 +105,18 @@ export default {
   will-change: transform;
 }
 
+.user-card.has-image {
+  background: #1a1a2e;
+}
+
+.card-bg-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .user-card.swiping-left {
   transform: translateX(-120%) rotate(-20deg);
   opacity: 0;
@@ -113,6 +137,17 @@ export default {
   z-index: 1;
 }
 
+.has-image .card-gradient {
+  height: 70%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 30%,
+    rgba(0, 0, 0, 0.3) 60%,
+    transparent 100%
+  );
+}
+
 .card-content {
   position: relative;
   height: 100%;
@@ -122,6 +157,11 @@ export default {
   align-items: center;
   padding: 2rem;
   z-index: 2;
+}
+
+.has-image .card-content {
+  justify-content: flex-end;
+  padding-bottom: 2.5rem;
 }
 
 .user-avatar {
@@ -146,6 +186,12 @@ export default {
   color: var(--text-primary);
 }
 
+.user-info.with-image {
+  text-align: left;
+  align-self: flex-start;
+  width: 100%;
+}
+
 .username {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 2rem;
@@ -167,6 +213,10 @@ export default {
   gap: 0.75rem;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+.with-image .tags {
+  justify-content: flex-start;
 }
 
 .tag {

@@ -21,17 +21,53 @@
       <!-- Avatar Section -->
       <div class="avatar-section">
         <div class="avatar-wrapper">
-          <div class="avatar">
-            {{ userInitial }}
+          <div class="avatar" :class="{ 'has-image': avatarPreview || formData.profilePicUrl }">
+            <img 
+              v-if="avatarPreview || formData.profilePicUrl" 
+              :src="avatarPreview || formData.profilePicUrl" 
+              alt="Profile" 
+              class="avatar-image"
+            />
+            <span v-else>{{ userInitial }}</span>
+            
+            <!-- Upload progress overlay -->
+            <div v-if="isUploading" class="upload-overlay">
+              <div class="upload-progress">
+                <svg class="progress-ring" viewBox="0 0 36 36">
+                  <circle 
+                    class="progress-ring-bg" 
+                    cx="18" cy="18" r="16" 
+                    fill="none" 
+                    stroke-width="3"
+                  />
+                  <circle 
+                    class="progress-ring-fill" 
+                    cx="18" cy="18" r="16" 
+                    fill="none" 
+                    stroke-width="3"
+                    :stroke-dasharray="`${uploadProgress}, 100`"
+                  />
+                </svg>
+                <span class="progress-text">{{ uploadProgress }}%</span>
+              </div>
+            </div>
           </div>
-          <button class="avatar-edit-btn">
+          <button class="avatar-edit-btn" @click="triggerFileInput" :disabled="isUploading">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
               <circle cx="12" cy="13" r="4"/>
             </svg>
           </button>
+          <input 
+            ref="fileInput"
+            type="file" 
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            class="file-input-hidden"
+            @change="handleFileSelect"
+          />
         </div>
         <p class="avatar-hint">{{ t('profile.photoHint') }}</p>
+        <p v-if="uploadError" class="upload-error">{{ uploadError }}</p>
       </div>
 
       <!-- Form -->
@@ -171,6 +207,7 @@
 <script>
 import { t } from '@/lang';
 import { updateUser } from '@/services/userService';
+import { uploadImage, createPreviewUrl, revokePreviewUrl } from '@/services/imageService';
 
 export default {
   name: 'EditProfile',
@@ -188,12 +225,19 @@ export default {
         age: null,
         bio: '',
         sex: '',
-        sexualOrientation: ''
+        sexualOrientation: '',
+        profilePicUrl: ''
       },
       originalData: null,
       isSaving: false,
       error: null,
       success: false,
+      // Image upload state
+      avatarPreview: null,
+      isUploading: false,
+      uploadProgress: 0,
+      uploadError: null,
+      pendingImageFile: null,
       sexOptions: [
         { value: 'male', label: t('auth.male'), icon: '👨' },
         { value: 'female', label: t('auth.female'), icon: '👩' },
@@ -239,11 +283,70 @@ export default {
           age: this.user.age || null,
           bio: this.user.bio || '',
           sex: this.user.sex || '',
-          sexualOrientation: this.user.sexualOrientation || ''
+          sexualOrientation: this.user.sexualOrientation || '',
+          profilePicUrl: this.user.profilePicUrl || ''
         };
         this.originalData = { ...this.formData };
       }
     },
+    
+    // Image upload methods
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+    
+    async handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      // Reset states
+      this.uploadError = null;
+      
+      // Create preview immediately
+      if (this.avatarPreview) {
+        revokePreviewUrl(this.avatarPreview);
+      }
+      this.avatarPreview = createPreviewUrl(file);
+      
+      // Upload the image
+      await this.uploadImageFile(file);
+      
+      // Clear file input
+      event.target.value = '';
+    },
+    
+    async uploadImageFile(file) {
+      this.isUploading = true;
+      this.uploadProgress = 0;
+      this.uploadError = null;
+      
+      try {
+        const result = await uploadImage(file, (progress) => {
+          this.uploadProgress = progress;
+        });
+        
+        // Update form data with the uploaded image URL
+        this.formData.profilePicUrl = result.url;
+        
+        // Clear preview since we now have the real URL
+        if (this.avatarPreview) {
+          revokePreviewUrl(this.avatarPreview);
+          this.avatarPreview = null;
+        }
+        
+      } catch (err) {
+        this.uploadError = err.message || this.t('profile.uploadError');
+        // Revert preview on error
+        if (this.avatarPreview) {
+          revokePreviewUrl(this.avatarPreview);
+          this.avatarPreview = null;
+        }
+      } finally {
+        this.isUploading = false;
+        this.uploadProgress = 0;
+      }
+    },
+    
     async handleSave() {
       if (!this.hasChanges) return;
       
@@ -269,6 +372,13 @@ export default {
       } finally {
         this.isSaving = false;
       }
+    }
+  },
+  
+  beforeUnmount() {
+    // Clean up preview URL when component is destroyed
+    if (this.avatarPreview) {
+      revokePreviewUrl(this.avatarPreview);
     }
   }
 };
@@ -379,6 +489,76 @@ export default {
   font-weight: 700;
   color: white;
   text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar.has-image {
+  background: transparent;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-input-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Upload progress overlay */
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.upload-progress {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+.progress-ring-fill {
+  stroke: var(--accent-pink);
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.2s ease;
+}
+
+.progress-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+}
+
+.upload-error {
+  color: #ff8a8a;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  text-align: center;
 }
 
 .avatar-edit-btn {

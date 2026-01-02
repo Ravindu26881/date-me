@@ -90,6 +90,9 @@ export default {
     bioPlaceholder: 'Tell others about yourself...',
     identity: 'Identity & Preferences',
     saveSuccess: 'Profile updated successfully!',
-    saveError: 'Failed to update profile. Please try again.'
+    saveError: 'Failed to update profile. Please try again.',
+    uploadError: 'Failed to upload image. Please try again.',
+    uploadingImage: 'Uploading image...',
+    imageUploaded: 'Image uploaded successfully!'
   }
 };

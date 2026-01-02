@@ -22,8 +22,14 @@
         
         <!-- User Menu -->
         <div class="user-menu" v-click-outside="closeUserMenu">
-          <button class="user-btn" @click="toggleUserMenu" :class="{ active: showUserMenu }">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="user-btn" @click="toggleUserMenu" :class="{ active: showUserMenu, 'has-image': currentUser?.profilePicUrl }">
+            <img 
+              v-if="currentUser?.profilePicUrl" 
+              :src="currentUser.profilePicUrl" 
+              :alt="displayName"
+              class="user-btn-image"
+            />
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
               <circle cx="12" cy="7" r="4"/>
             </svg>
@@ -33,8 +39,14 @@
           <transition name="dropdown">
             <div v-if="showUserMenu" class="user-dropdown">
               <div class="user-info">
-                <div class="user-avatar">
-                  {{ userInitial }}
+                <div class="user-avatar" :class="{ 'has-image': currentUser?.profilePicUrl }">
+                  <img 
+                    v-if="currentUser?.profilePicUrl" 
+                    :src="currentUser.profilePicUrl" 
+                    :alt="displayName"
+                    class="avatar-image"
+                  />
+                  <span v-else>{{ userInitial }}</span>
                 </div>
                 <div class="user-details">
                   <span class="user-name">{{ displayName }}</span>
@@ -288,6 +300,17 @@ body {
   transition: color 0.2s ease;
 }
 
+.user-btn.has-image {
+  padding: 0;
+  overflow: hidden;
+}
+
+.user-btn-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Dropdown */
 .user-dropdown {
   position: absolute;
@@ -340,6 +363,17 @@ body {
   color: white;
   text-transform: uppercase;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.user-avatar.has-image {
+  background: transparent;
+}
+
+.user-avatar .avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .user-details {
